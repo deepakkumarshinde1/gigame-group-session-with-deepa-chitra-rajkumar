@@ -1,3 +1,5 @@
+const UserModel = require("../../model/users.model");
+
 let testUser = [];
 
 module.exports.welcomeUser = (request, response) => {
@@ -15,16 +17,26 @@ module.exports.getUsers = (request, response) => {
   });
 };
 
-module.exports.addNewUser = (request, response) => {
-  let data = request.body;
-  testUser.push({
-    id: Date.now(),
-    user: data.user,
-    email: data.email,
-  });
-  response.json({
-    message: "User Added successfully",
-    status: true,
-    totalUsers: testUser.length,
-  });
+module.exports.addNewUser = async (request, response) => {
+  try {
+    let data = request.body;
+
+    let newUser = new UserModel({
+      user: data.user,
+      email: data.email,
+    });
+
+    let user = await newUser.save();
+
+    response.json({
+      message: "User Added successfully",
+      status: true,
+      user,
+    });
+  } catch (error) {
+    response.json({
+      message: error.message,
+      status: false,
+    });
+  }
 };
